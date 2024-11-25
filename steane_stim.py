@@ -95,9 +95,3 @@ def stab_extract_ft_flag(circuit, data_qubits, ancilla_qubits):
   
   return
 
-''' data_qubits is assumed to contain 7 qubit indices, ancilla_qubits is assumed to contain two, each initialized in $\bra{0}$
-'''
-def meas_H_logical_ft_flag(circuit, data_qubits, ancilla_qubits):
-  circuit.append("H", ancilla_qubits[0])
-
-  circuit.append()
