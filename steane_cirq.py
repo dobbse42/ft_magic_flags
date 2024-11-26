@@ -89,11 +89,13 @@ def H_logical_nonft(circuit, data_qubits):
 def H_logical_ft_flag1(circuit, data_qubits, ancilla_qubits, qubitmanager):
   H_logical_nonft(circuit, data_qubits)
   meas_H_logical_ft_1flag(circuit, data_qubits, ancilla_qubits[:2], qubitmanager)
-  stab_extract_ft_flag(circuit, data_qubits, ancilla_qubits[2:], qubitmanager)
+  stab_extract_ft_flag(circuit, data_qubits, qubitmanager)
   return
 
-def stab_extract_ft_flag(circuit, data_qubits, ancilla_qubits, qubitmanager):
+def stab_extract_ft_flag(circuit, data_qubits, qubitmanager):
+  ancilla_qubits = qubitmanager.qalloc(3)
   circuit.append(cirq.H(ancilla_qubits[0]))
+  
   circuit.append(cirq.CNOT(ancilla_qubits[0], data_qubits[4]))
   circuit.append(cirq.CNOT(data_qubits[6], ancilla_qubits[1]))
   circuit.append(cirq.CNOT(data_qubits[5], ancilla_qubits[2]))
@@ -144,5 +146,43 @@ def stab_extract_ft_flag(circuit, data_qubits, ancilla_qubits, qubitmanager):
   return
 
 
+def meas_H_logical_ft_2flag(circuit, data_qubits, qubitmanager):
+  ancilla_qubits = qubitmanager.qalloc(4)
+  circuit.append(cirq.H(ancilla_qubits[0]))
+
+  controlled_h(circuit, ancilla_qubits[0], data_qubits[6], qubitmanager)
+  circuit.append(cirq.CNOT(ancilla_qubits[0], ancilla_qubits[1]))
+  controlled_h(circuit, ancilla_qubits[0], data_qubits[5], qubitmanager)
+  circuit.append(cirq.CNOT(ancilla_qubits[0], ancilla_qubits[2]))
+  controlled_h(circuit, ancilla_qubits[0], data_qubits[4], qubitmanager)
+  circuit.append(cirq.CNOT(ancilla_qubits[0], ancilla_qubits[3]))
+  circuit.append(cirq.CNOT(ancilla_qubits[0], ancilla_qubits[2]))
+  circuit.append(cirq.measure(ancilla_qubits[2]))
+  ancilla_qubits[2] = qubitmanager.qalloc(1)[0]
+  circuit.append(cirq.CNOT(ancilla_qubits[0], ancilla_qubits[2]))
+  controlled_h(circuit, ancilla_qubits[0], data_qubits[1], qubitmanager)
+  circuit.append(cirq.CNOT(ancilla_qubits[0], ancilla_qubits[2]))
+  circuit.append(cirq.CNOT(ancilla_qubits[0], ancilla_qubits[3]))
+  controlled_h(circuit, ancilla_qubits[0], data_qubits[3], qubitmanager)
+  circuit.append(cirq.measure(ancilla_qubits[2]))
+  circuit.append(cirq.measure(ancilla_qubits[3]))
+  controlled_h(circuit, ancilla_qubits[0], data_qubits[0], qubitmanager)
+  circuit.append(cirq.CNOT(ancilla_qubits[0], ancilla_qubits[1]))
+  controlled_h(circuit, ancilla_qubits[0], data_qubits[2], qubitmanager)
+  circuit.append(cirq.measure(ancilla_qubits[1]))
+  circuit.append(cirq.measure_single_paulistring(cirq.X(ancilla_qubits[0])*cirq.I(data_qubits[0])))
+
+  return
+
+
+def H_logical_ft_flag2(circuit, data_qubits, qubitmanager):
+  H_logical_nonft(circuit, data_qubits)
+  meas_H_logical_ft_2flag(circuit, data_qubits, qubitmanager)
+  stab_extract_ft_flag(circuit, data_qubits, qubitmanager)
+  meas_H_logical_ft_2flag(circuit, data_qubits, qubitmanager)
+  stab_extract_ft_flag(circuit, data_qubits, qubitmanager)
+  meas_H_logical_ft_2flag(circuit, data_qubits, qubitmanager)
+
+  return
 
 
