@@ -186,3 +186,70 @@ def H_logical_ft_flag2(circuit, data_qubits, qubitmanager):
   return
 
 
+def meas_H_logical_ft_17(circuit, data_qubits, qubitmanager):
+  ancilla_qubits = qubitmanager.qalloc(5)
+  circuit.append(cirq.H(ancilla_qubits[0]))
+
+  controlled_h(circuit, ancilla_qubits[0], data_qubits[0], qubitmanager)
+  circuit.append(cirq.CNOT(ancilla_qubits[0], ancilla_qubits[1]))
+  controlled_h(circuit, ancilla_qubits[0], data_qubits[1], qubitmanager)
+  circuit.append(cirq.CNOT(ancilla_qubits[0], ancilla_qubits[2]))
+  controlled_h(circuit, ancilla_qubits[0], data_qubits[2], qubitmanager)
+  controlled_h(circuit, ancilla_qubits[0], data_qubits[3], qubitmanager)
+  circuit.append(cirq.CNOT(ancilla_qubits[0], ancilla_qubits[3]))
+  controlled_h(circuit, ancilla_qubits[0], data_qubits[4], qubitmanager)
+  controlled_h(circuit, ancilla_qubits[0], data_qubits[5], qubitmanager)
+  circuit.append(cirq.CNOT(ancilla_qubits[0], ancilla_qubits[4]))
+  controlled_h(circuit, ancilla_qubits[0], data_qubits[6], qubitmanager)
+  circuit.append(cirq.CNOT(ancilla_qubits[0], ancilla_qubits[3]))
+  circuit.append(cirq.measure(ancilla_qubits[3]))
+  ancilla_qubits[3] = qubitmanager.qalloc(1)[0]
+  controlled_h(circuit, ancilla_qubits[0], data_qubits[7], qubitmanager)
+
+  circuit.append(cirq.CNOT(ancilla_qubits[0], ancilla_qubits[3]))
+  controlled_h(circuit, ancilla_qubits[0], data_qubits[8], qubitmanager)
+  circuit.append(cirq.CNOT(ancilla_qubits[0], ancilla_qubits[4]))
+  controlled_h(circuit, ancilla_qubits[0], data_qubits[9], qubitmanager)
+  circuit.append(cirq.measure(ancilla_qubits[4]))
+  ancilla_qubits[4] = qubitmanager.qalloc(1)[0]
+
+  circuit.append(cirq.CNOT(ancilla_qubits[0], ancilla_qubits[4]))
+  controlled_h(circuit, ancilla_qubits[0], data_qubits[10], qubitmanager)
+  circuit.append(cirq.CNOT(ancilla_qubits[0], ancilla_qubits[3]))
+  circuit.append(cirq.measure(ancilla_qubits[3]))
+  ancilla_qubits[3] = qubitmanager.qalloc(1)[0]
+  controlled_h(circuit, ancilla_qubits[0], data_qubits[11], qubitmanager)
+
+
+  circuit.append(cirq.CNOT(ancilla_qubits[0], ancilla_qubits[3]))
+  controlled_h(circuit, ancilla_qubits[0], data_qubits[12], qubitmanager)
+  circuit.append(cirq.CNOT(ancilla_qubits[0], ancilla_qubits[4]))
+  circuit.append(cirq.measure(ancilla_qubits[4]))
+  ancilla_qubits[4] = qubitmanager.qalloc(1)[0]
+  controlled_h(circuit, ancilla_qubits[0], data_qubits[13], qubitmanager)
+
+  circuit.append(cirq.CNOT(ancilla_qubits[0], ancilla_qubits[4]))
+  controlled_h(circuit, ancilla_qubits[0], data_qubits[14], qubitmanager)
+  circuit.append(cirq.CNOT(ancilla_qubits[0], ancilla_qubits[3]))
+  circuit.append(cirq.CNOT(ancilla_qubits[0], ancilla_qubits[1]))
+  circuit.append(cirq.measure(ancilla_qubits[3]))
+  controlled_h(circuit, ancilla_qubits[0], data_qubits[15], qubitmanager)
+  circuit.append(cirq.measure(ancilla_qubits[1]))
+  circuit.append(cirq.CNOT(ancilla_qubits[0], ancilla_qubits[2]))
+  controlled_h(circuit, ancilla_qubits[0], data_qubits[16], qubitmanager)
+  circuit.append(cirq.measure(ancilla_qubits[2]))
+  circuit.append(cirq.CNOT(ancilla_qubits[0], ancilla_qubits[4]))
+  circuit.append(cirq.measure(ancilla_qubits[4]))
+  circuit.append(cirq.measure_single_paulistring(cirq.X(ancilla_qubits[0] * cirq.I(data_qubits[0]))))
+
+  return
+
+
+
+
+
+
+  
+
+
+
