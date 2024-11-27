@@ -1,22 +1,39 @@
 import cirq
+import numpy as np
+import sympy
+
+class my_T(cirq.Gate):
+  def __init__(self):
+    super(my_T, self)
+
+  def _num_qubits_(self):
+    return 1
+
+  def _unitary_(self):
+    return np.array([
+      [np.cos(np.pi/8), -1*np.sin(np.pi/8)],
+      [np.sin(np.pi/8), np.cos(np.pi/8)]
+    ])
+
+  def _circuit_diagram_info(self, args):
+    return "my_T"
+
 
 ''' ancilla is assumed to start in the $\ket{0}$ state
 '''
 def distill_magic_state(circuit, ancilla, data, adj=False):
-  circuit.append(cirq.T(ancilla))
+  circuit.append(my_T().on(ancilla))
   circuit.append(cirq.Y(data).controlled_by(ancilla))
   #measure in the Y-basis
-  #circuit.append(cirq.S(ancilla) ** -1) # changing basis
-  #circuit.append(cirq.H(ancilla))
-  #circuit.append(cirq.measure(ancilla, key="m")) # measurement with key m
-  circuit.append(cirq.measure_single_paulistring(cirq.Y(ancilla) * cirq.I(data)))
+  circuit.append(cirq.measure_single_paulistring(cirq.Y(ancilla), key='anc_'+str(ancilla)))
 
-  circuit.append(cirq.ResetChannel().on(ancilla))
   #apply correction
   if adj:
-    circuit.append((cirq.S(data)**-1).with_classical_controls(cirq.KeyCondition(str(ancilla)))) #probably not 1, but actually 0
+    symbol = sympy.Symbol('anc_'+str(ancilla))
+    expr = sympy.Eq(symbol, 0)
+    circuit.append((cirq.S(data)**-1).with_classical_controls(cirq.SympyCondition(expr))) #probably not 1, but actually 0
   else:
-    circuit.append(cirq.S(data).with_classical_controls(cirq.KeyCondition(str(ancilla))))
+    circuit.append(cirq.S(data).with_classical_controls('anc_'+str(ancilla)))
 
 
 
@@ -56,7 +73,7 @@ def meas_H_logical_ft_1flag(circuit, data_qubits, ancilla_qubits, qubitmanager):
 
   # measure ancilla[0] in the X-basis
   circuit.append(cirq.H(ancilla_qubits[0]))
-  circuit.append(cirq.measure(ancilla_qubits[0]))
+  circuit.append(cirq.measure(ancilla_qubits[0], key='ans_meas_'+str(ancilla_qubits[0])))
 
   return
 
@@ -68,7 +85,7 @@ def H_logical_nonft(circuit, data_qubits):
   circuit.append(cirq.H(data_qubits[1]))
   circuit.append(cirq.H(data_qubits[3]))
   # initializing the h_index'th qubit to $\ket{H}$
-  circuit.append(cirq.T(data_qubits[3]))
+  circuit.append(my_T().on(data_qubits[3]))
 
   circuit.append(cirq.CNOT(data_qubits[3], data_qubits[4]))
   circuit.append(cirq.CNOT(data_qubits[0], data_qubits[6]))
@@ -113,7 +130,9 @@ def stab_extract_ft_flag(circuit, data_qubits, qubitmanager):
   circuit.append(cirq.CNOT(data_qubits[2], ancilla_qubits[2]))
 
   circuit.append(cirq.H(ancilla_qubits[0]))
-  circuit.append(cirq.measure(ancilla_qubits[0:3]))
+  circuit.append(cirq.measure(ancilla_qubits[0], key='syn_'+str(ancilla_qubits[0])))
+  circuit.append(cirq.measure(ancilla_qubits[1], key='flag_'+str(ancilla_qubits[1])))
+  circuit.append(cirq.measure(ancilla_qubits[2], key='flag_'+str(ancilla_qubits[2])))
   #circuit.append(cirq.ResetChannel().on_each(ancilla_qubits[0:3]))
   ancilla_qubits = qubitmanager.qalloc(3)
   circuit.append(cirq.H(ancilla_qubits[1]))
@@ -141,8 +160,9 @@ def stab_extract_ft_flag(circuit, data_qubits, qubitmanager):
 
   circuit.append(cirq.H(ancilla_qubits[1]))
   circuit.append(cirq.H(ancilla_qubits[2]))
-  circuit.append(cirq.measure(ancilla_qubits[0:3]))
-
+  circuit.append(cirq.measure(ancilla_qubits[0], key='syn_'+str(ancilla_qubits[0])))
+  circuit.append(cirq.measure(ancilla_qubits[1], key='flag_'+str(ancilla_qubits[1])))
+  circuit.append(cirq.measure(ancilla_qubits[2], key='flag_'+str(ancilla_qubits[2])))
   return
 
 
@@ -249,7 +269,7 @@ def meas_H_logical_ft_17(circuit, data_qubits, qubitmanager):
 
 
 
-  
+
 
 
 
